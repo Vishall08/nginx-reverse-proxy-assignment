@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  nginx:
+    build:
+      context: ./nginx
+    ports:
+      - "8080:80"
+    depends_on:
+      - service_1
+      - service_2
+    networks:
+      - app-net
+
+  service_1:
+    build:
+      context: ./service_1
+    expose:
+      - "8001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - app-net
+
+  service_2:
+    build:
+      context: ./service_2
+    expose:
+      - "8002"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    driver: bridge
